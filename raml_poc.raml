@@ -1,0 +1,124 @@
+#%RAML 1.0
+title: raml_poc
+
+protocols: [HTTP, HTTPS]
+
+
+
+traits:
+  errorResponse: !include traits/errorTrait.raml
+  clientIdEnforcement: !include exchange_modules/c55582a5-2bc3-4058-8edd-14961f278a2d/clientidenforcement/1.0.0/clientidenforcement.raml
+  
+
+securitySchemes:
+  securityCustomScheme: !include security-scheme/customSecurityScheme.raml
+
+securedBy:
+  - securityCustomScheme
+
+uses:
+  custType: libraries/customerLibrary.raml
+
+
+
+/accounts:
+  post:
+    is: [errorResponse, clientIdEnforcement]
+    description: Create account for customer
+    body:
+      application/json:
+        example: !include examples/account.raml
+    responses:
+      201:
+        body:
+          application/json:
+            example: !include examples/accountResponse.raml                    
+
+  get:
+    is: [errorResponse, clientIdEnforcement]
+    description: Fetch account details on basis of CustomerId
+    queryParameters:
+      customerId:
+        type: string
+        required: true
+        example: "cust123456"
+    responses:
+      200:
+        body:
+          application/json:
+            example: !include examples/account.raml
+              
+          
+  /{accountId}:
+    # is: [clientIdEnforcement]
+    get:
+      is: [errorResponse, clientIdEnforcement]
+      description: Fetch single account
+      responses:
+        200:
+          body:
+            application/json:
+              example:
+                 !include examples/account.raml
+              
+    /balances:
+      # is: [clientIdEnforcement]
+      get:
+        is: [errorResponse, clientIdEnforcement]
+        description: Fetch balance of individual account
+        responses:
+          200:
+            body:
+              application/json:
+                example: !include examples/balance.raml
+          
+    /transactions:
+      # is: [clientIdEnforcement]
+      get:
+        is: [errorResponse, clientIdEnforcement]
+        description: Fetch all transactions
+        queryParameters:
+          fromDate:
+            type: string
+            required: false
+            example: "2023-09-01"
+          toDate:
+            type: string
+            required: false
+            example: "2023-09-01"
+        responses:
+          200:
+            body:
+              application/json:
+                example: !include examples/transaction.raml
+      
+      /{iransactionId}:
+        # is: [clientIdEnforcement]
+        get:
+          is: [errorResponse, clientIdEnforcement]
+          description: Fetch single transaction
+          responses:
+            200:
+              body:
+                application/json:
+                  example: !include examples/transaction.raml
+
+
+/customers:
+  # is: [clientIdEnforcement]
+  get:
+    is: [errorResponse, clientIdEnforcement]
+    description: Fetch all customers
+    responses:
+      200:
+        body:
+          application/json:
+            type: custType.customerType[]
+            
+                    
+                  
+       
+              
+              
+
+          
